@@ -1,0 +1,12 @@
+export const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);
+export const badge=s=>`<span class="badge ${['Critical','High'].includes(s)?'red':['Pending','Low Stock','Medium','Standby'].includes(s)?'yellow':['Resolved','Available','Open'].includes(s)?'green':['Assigned','In Progress'].includes(s)?'blue':'gray'}">${esc(s)}</span>`;
+export function toast(message,error=false){const e=document.createElement('div');e.className=`toast ${error?'error':''}`;e.textContent=message;document.querySelector('#toast-container').append(e);setTimeout(()=>e.remove(),3200)}
+let previouslyFocused = null;
+
+function modalElements(){return {backdrop:document.querySelector('#modal-backdrop'),title:document.querySelector('#modal-title'),body:document.querySelector('#modal-body')}}
+
+export function initializeModal(){const {backdrop}=modalElements();if(!backdrop||backdrop.dataset.initialized)return;backdrop.dataset.initialized='true';backdrop.addEventListener('click',event=>{if(event.target===backdrop||event.target.closest('[data-close-modal],[data-close]'))closeModal()});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!backdrop.hidden)closeModal()})}
+export function openModal(title,content){const {backdrop,title:heading,body}=modalElements();if(!backdrop||!heading||!body)return;previouslyFocused=document.activeElement;heading.textContent=title;body.innerHTML=content;backdrop.hidden=false;backdrop.setAttribute('aria-hidden','false');backdrop.querySelector('input, select, textarea, button')?.focus()}
+export function closeModal(){const {backdrop,title,body}=modalElements();if(!backdrop)return;backdrop.hidden=true;backdrop.setAttribute('aria-hidden','true');if(title)title.textContent='';if(body)body.replaceChildren();previouslyFocused?.focus?.();previouslyFocused=null}
+export const field=(name,label,type='text',value='',required=true,options=[])=>`<div class="field"><label for="f-${name}">${label}</label>${type==='select'?`<select id="f-${name}" name="${name}" ${required?'required':''}>${options.map(x=>`<option ${x===value?'selected':''}>${x}</option>`).join('')}</select>`:type==='textarea'?`<textarea id="f-${name}" name="${name}" ${required?'required':''}>${esc(value)}</textarea>`:`<input id="f-${name}" name="${name}" type="${type}" value="${esc(value)}" ${required?'required':''}>`}</div>`;
+export function values(form){return Object.fromEntries(new FormData(form));}

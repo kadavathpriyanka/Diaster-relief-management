@@ -1,0 +1,4 @@
+/* The author display rule must not override HTML's hidden modal state. */
+.modal-backdrop[hidden] {
+  display: none !important;
+}
